@@ -40,3 +40,18 @@ def analyze(img_path, actions, detector_backend, enforce_detection, align):
     )
     result["results"] = demographies
     return result
+
+
+def find(
+    img_path, db_path, model_name, detector_backend, distance_metric, enforce_detection, align
+):
+    obj = DeepFace.find(
+        img_path=img_path,
+        db_path=db_path,
+        model_name=model_name,
+        detector_backend=detector_backend,
+        distance_metric=distance_metric,
+        align=align,
+        enforce_detection=enforce_detection,
+    )
+    return obj

@@ -1,4 +1,6 @@
 from flask import Blueprint, request
+from pandas import DataFrame
+
 import service
 
 blueprint = Blueprint("routes", __name__)
@@ -98,3 +100,37 @@ def analyze():
     )
 
     return demographies
+
+@blueprint.route("/find", methods=["POST"])
+def find():
+    input_args = request.get_json()
+
+    if input_args is None:
+        return {"message": "empty input set passed"}
+
+    img_path = input_args.get("img_path")
+
+    if img_path is None:
+        return {"message": "you must pass img_path input"}
+
+    db_path = input_args.get("db_path", "/Users/wilkmaia/Projects/face-test/images")
+    model_name = input_args.get("model_name", "Facenet512")
+    detector_backend = input_args.get("detector_backend", "ssd")
+    enforce_detection = input_args.get("enforce_detection", True)
+    distance_metric = input_args.get("distance_metric", "euclidean_l2")
+    align = input_args.get("align", True)
+
+    dfs = service.find(
+        img_path=img_path,
+        db_path=db_path,
+        model_name=model_name,
+        detector_backend=detector_backend,
+        distance_metric=distance_metric,
+        align=align,
+        enforce_detection=enforce_detection,
+    )
+
+    if len(dfs) == 0:
+        return (404, "Not found")
+
+    return list(map(DataFrame.to_dict, dfs))
